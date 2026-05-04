@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Anthony Liao</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#08080D;--surface:#0F0F16;--surface2:#15151E;
+  --border:rgba(255,255,255,0.06);--border-hi:rgba(255,255,255,0.12);
+  --text:#C8D0DC;--muted:#7A8599;--dim:#3A4152;
+  --hi:#EDF0F7;--glow:rgba(200,210,230,0.08);
+}
+body{font-family:'Syne',sans-serif;background:var(--bg);color:var(--text);font-size:15px;line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden;}
+canvas#bg{position:fixed;inset:0;z-index:0;pointer-events:none;}
+a{color:inherit;text-decoration:none;}
+
+nav{position:sticky;top:0;z-index:100;background:rgba(8,8,13,0.85);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);height:58px;display:flex;align-items:center;justify-content:space-between;padding:0 2.5rem;}
+.nav-name{font-family:'DM Mono',monospace;font-size:12px;letter-spacing:0.08em;color:var(--hi);opacity:0.6;}
+.nav-links{display:flex;gap:2.5rem;list-style:none;}
+.nav-links a{font-size:11px;color:var(--muted);letter-spacing:0.14em;text-transform:uppercase;transition:color 0.2s;}
+.nav-links a:hover{color:var(--hi);}
+
+.wrap{position:relative;z-index:1;max-width:860px;margin:0 auto;padding:0 2.5rem;}
+section{padding:6rem 0;}
+
+.hero{padding-top:11rem;padding-bottom:8rem;}
+.hero-meta{font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);letter-spacing:0.14em;text-transform:uppercase;margin-bottom:2rem;display:flex;align-items:center;gap:12px;}
+.hero-meta::before{content:'';width:24px;height:1px;background:var(--dim);}
+.hero h1{font-size:clamp(3.5rem,7vw,5.8rem);font-weight:800;line-height:0.95;letter-spacing:-0.04em;margin-bottom:1.75rem;color:var(--hi);}
+.hero h1 .last{display:block;color:var(--muted);font-weight:400;font-size:0.85em;letter-spacing:-0.02em;margin-top:0.15em;}
+.hero-tagline{font-size:16px;color:var(--muted);line-height:1.75;max-width:400px;margin-bottom:3rem;font-weight:400;}
+.hero-tagline em{color:var(--text);font-style:normal;}
+.hero-actions{display:flex;gap:1rem;align-items:center;}
+.btn-primary{display:inline-flex;align-items:center;gap:8px;padding:11px 24px;font-size:12px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;border-radius:4px;background:var(--hi);color:var(--bg);border:none;cursor:pointer;transition:all 0.2s;font-family:'Syne',sans-serif;}
+.btn-primary:hover{opacity:0.88;}
+.btn-ghost{font-family:'DM Mono',monospace;font-size:12px;color:var(--muted);letter-spacing:0.06em;display:flex;align-items:center;gap:6px;transition:color 0.2s;}
+.btn-ghost:hover{color:var(--text);}
+.btn-ghost::after{content:'→';}
+
+.sh{display:flex;align-items:center;gap:16px;margin-bottom:3rem;}
+.sh-num{font-family:'DM Mono',monospace;font-size:10px;color:var(--dim);letter-spacing:0.1em;}
+.sh-label{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.2em;text-transform:uppercase;color:var(--muted);}
+.sh-line{flex:1;height:1px;background:var(--border);}
+
+.about-text{font-size:17px;color:var(--text);line-height:2;max-width:580px;font-weight:400;}
+.about-text strong{color:var(--hi);font-weight:500;}
+
+.interest-row{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border);border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-top:3rem;}
+.ic{background:var(--surface);padding:1.5rem;transition:background 0.2s;display:flex;flex-direction:column;gap:0.75rem;}
+.ic:hover{background:var(--surface2);}
+.ic-icon{font-size:22px;line-height:1;}
+.ic-label{font-size:12px;font-weight:600;letter-spacing:0.04em;color:var(--hi);}
+.ic-sub{font-family:'DM Mono',monospace;font-size:10.5px;color:var(--muted);line-height:1.6;}
+
+.proj-grid{display:flex;flex-direction:column;gap:1px;background:var(--border);border:1px solid var(--border);border-radius:8px;overflow:hidden;}
+.proj{background:var(--surface);padding:2rem;display:grid;grid-template-columns:1fr auto;gap:0.5rem 2rem;transition:background 0.2s;}
+.proj:hover{background:var(--surface2);}
+.proj.top{border-top:1px solid rgba(200,210,230,0.1);}
+.proj-title{font-size:15px;font-weight:600;color:var(--hi);letter-spacing:-0.01em;}
+.proj-wip{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);border:1px solid var(--border-hi);padding:2px 8px;border-radius:3px;align-self:start;white-space:nowrap;}
+.proj-desc{font-size:13.5px;color:var(--text);line-height:1.75;grid-column:1/-1;margin-top:0.1rem;}
+.proj-foot{display:flex;align-items:center;justify-content:space-between;grid-column:1/-1;margin-top:0.5rem;}
+.tag-row{display:flex;flex-wrap:wrap;gap:5px;}
+.tag{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);border:1px solid var(--border-hi);padding:2px 8px;border-radius:3px;letter-spacing:0.03em;}
+.proj-note{font-family:'DM Mono',monospace;font-size:10px;color:var(--dim);letter-spacing:0.04em;}
+
+.res-list{display:flex;flex-direction:column;gap:1px;background:var(--border);border:1px solid var(--border);border-radius:8px;overflow:hidden;}
+.res{background:var(--surface);padding:1.25rem 2rem;display:flex;align-items:center;gap:1.5rem;transition:background 0.2s;}
+.res:hover{background:var(--surface2);}
+.res-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+.dot-pub{background:#6DBF8A;}
+.dot-rev{background:#C8B96E;}
+.dot-prog{background:var(--dim);}
+.res-title{font-size:13.5px;font-weight:500;color:var(--text);flex:1;}
+.res-status{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);letter-spacing:0.06em;white-space:nowrap;}
+
+.contact-h{font-size:clamp(2rem,4vw,3rem);font-weight:700;letter-spacing:-0.03em;line-height:1.1;color:var(--hi);margin-bottom:1rem;}
+.contact-sub{font-size:14px;color:var(--muted);margin-bottom:2.5rem;}
+.contact-links{display:flex;gap:2rem;flex-wrap:wrap;align-items:center;}
+.clink{font-family:'DM Mono',monospace;font-size:12px;color:var(--muted);display:flex;align-items:center;gap:8px;transition:color 0.2s;letter-spacing:0.04em;}
+.clink:hover{color:var(--text);}
+
+footer{border-top:1px solid var(--border);padding:2rem 2.5rem;font-family:'DM Mono',monospace;font-size:10px;color:var(--dim);letter-spacing:0.08em;position:relative;z-index:1;display:flex;justify-content:space-between;}
+
+.fade{opacity:0;transform:translateY(16px);transition:opacity 0.6s ease,transform 0.6s ease;}
+.fade.visible{opacity:1;transform:none;}
+</style>
+</head>
+<body>
+<canvas id="bg"></canvas>
+
+<nav>
+  <span class="nav-name">anthony liao</span>
+  <ul class="nav-links">
+    <li><a href="#about">About</a></li>
+    <li><a href="#projects">Projects</a></li>
+    <li><a href="#research">Research</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+</nav>
+
+<div class="wrap">
+
+  <section class="hero">
+    <p class="hero-meta">Software Engineer · Wichita, KS</p>
+    <h1>Anthony<span class="last">Liao.</span></h1>
+    <p class="hero-tagline">I build things, lift things, and think about things — <em>usually all three at once.</em></p>
+    <div class="hero-actions">
+      <a class="btn-primary" href="Anthony_Liao_Resume_Final.pdf" download>Resume ↓</a>
+      <a class="btn-ghost" href="#contact">Get in touch</a>
+    </div>
+  </section>
+
+  <section id="about" class="fade">
+    <div class="sh"><span class="sh-num">01</span><span class="sh-label">About</span><span class="sh-line"></span></div>
+    <div class="about-text">
+      <p>I'm Anthony — software engineer, grad student, and occasional researcher. I pick up interests and run with them. Some turn into projects. Some turn into papers. Most turn into late nights. When I'm not at a screen, I'm building a keyboard or lifting something heavy.</p>
+    </div>
+    <div class="interest-row">
+      <div class="ic">
+        <span class="ic-icon">⌨️</span>
+        <p class="ic-label">Keyboard Building</p>
+        <p class="ic-sub">Custom switches, layouts, the eternal search for the perfect thock.</p>
+      </div>
+      <div class="ic">
+        <span class="ic-icon">🏋️</span>
+        <p class="ic-label">Powerlifting & Calisthenics</p>
+        <p class="ic-sub">Moving heavy things and doing cool bar tricks.</p>
+      </div>
+      <div class="ic">
+        <span class="ic-icon">🖥️</span>
+        <p class="ic-label">Computer Tech</p>
+        <p class="ic-sub">Hardware, software, whatever. If it's interesting, I'm reading about it.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="projects" class="fade">
+    <div class="sh"><span class="sh-num">02</span><span class="sh-label">Personal Projects</span><span class="sh-line"></span></div>
+    <div class="proj-grid">
+
+      <div class="proj top">
+        <p class="proj-title">M.S. Capstone — Clinical Data Science</p>
+        <span class="proj-wip">In Progress</span>
+        <p class="proj-desc">Machine learning and statistical modeling on clinical datasets. Also my third publication.</p>
+        <div class="proj-foot">
+          <div class="tag-row"><span class="tag">Python</span><span class="tag">Pandas</span><span class="tag">Machine Learning</span></div>
+          <span class="proj-note">Wichita State · May 2026</span>
+        </div>
+      </div>
+
+      <div class="proj">
+        <p class="proj-title">QUEST — Quiz Understanding & Evaluation for Study Tracking</p>
+        <div></div>
+        <p class="proj-desc">Built because studying without data felt like guessing. Analyzes quiz performance and tells you where to actually focus.</p>
+        <div class="proj-foot">
+          <div class="tag-row"><span class="tag">C#</span><span class="tag">WPF</span></div>
+        </div>
+      </div>
+
+      <div class="proj">
+        <p class="proj-title">EGO — Android App</p>
+        <div></div>
+        <p class="proj-desc">Senior design capstone at WSU. Designed and shipped an Android app end to end.</p>
+        <div class="proj-foot">
+          <div class="tag-row"><span class="tag">Java</span><span class="tag">Android</span></div>
+          <span class="proj-note">Senior Design · WSU</span>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <section id="research" class="fade">
+    <div class="sh"><span class="sh-num">03</span><span class="sh-label">Research & Publications</span><span class="sh-line"></span></div>
+    <div class="res-list">
+      <div class="res">
+        <span class="res-dot dot-pub"></span>
+        <p class="res-title">Clinical Data Science — Paper 1</p>
+        <span class="res-status">Published</span>
+      </div>
+      <div class="res">
+        <span class="res-dot dot-rev"></span>
+        <p class="res-title">Clinical Data Science — Paper 2</p>
+        <span class="res-status">Under Review</span>
+      </div>
+      <div class="res">
+        <span class="res-dot dot-prog"></span>
+        <p class="res-title">M.S. Capstone Research — Paper 3</p>
+        <span class="res-status">In Progress</span>
+      </div>
+    </div>
+  </section>
+
+  <section id="contact" class="fade">
+    <div class="sh"><span class="sh-num">04</span><span class="sh-label">Contact</span><span class="sh-line"></span></div>
+    <p class="contact-h">Let's build something<br/>worth launching.</p>
+    <p class="contact-sub">Open to new opportunities in software engineering.</p>
+    <div class="contact-links">
+      <a class="clink" href="mailto:anthonyliao.cs@gmail.com">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+        anthonyliao.cs@gmail.com
+      </a>
+      <a class="clink" href="https://linkedin.com/in/liaoa" target="_blank">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+        linkedin.com/in/liaoa
+      </a>
+      <a class="btn-primary" href="Anthony_Liao_Resume_Final.pdf" download>Resume ↓</a>
+    </div>
+  </section>
+
+</div>
+
+<footer>
+  <span>© 2026 Anthony Liao</span>
+  <span>anthonyliao.cs@gmail.com</span>
+</footer>
+
+<script>
+const canvas=document.getElementById('bg'),ctx=canvas.getContext('2d');
+let stars=[],shooters=[];
+function resize(){canvas.width=window.innerWidth;canvas.height=window.innerHeight;}
+function initStars(){stars=[];const n=Math.floor(canvas.width*canvas.height/5000);for(let i=0;i<n;i++)stars.push({x:Math.random()*canvas.width,y:Math.random()*canvas.height,r:Math.random()*0.85+0.1,o:Math.random()*0.35+0.08,s:Math.random()*0.2+0.03});}
+function spawnShooter(){shooters.push({x:Math.random()*canvas.width*0.65,y:Math.random()*canvas.height*0.45,vx:5+Math.random()*4,vy:2.5+Math.random()*2,len:90+Math.random()*70,life:1,decay:0.016+Math.random()*0.01});}
+setInterval(()=>{if(Math.random()<0.65)spawnShooter();},2000);
+let f=0;
+function draw(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);f++;
+  for(const s of stars){const fl=s.o+Math.sin(f*s.s+s.x)*0.09;ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,Math.PI*2);ctx.fillStyle=`rgba(180,192,215,${Math.max(0,Math.min(1,fl))})`;ctx.fill();}
+  for(let i=shooters.length-1;i>=0;i--){
+    const sh=shooters[i],a=sh.life*0.65;
+    const tx=sh.x-sh.vx*(sh.len/sh.vx),ty=sh.y-sh.vy*(sh.len/sh.vx);
+    const g=ctx.createLinearGradient(tx,ty,sh.x,sh.y);
+    g.addColorStop(0,'rgba(190,205,225,0)');g.addColorStop(1,`rgba(215,225,242,${a})`);
+    ctx.beginPath();ctx.moveTo(tx,ty);ctx.lineTo(sh.x,sh.y);ctx.strokeStyle=g;ctx.lineWidth=1.1;ctx.stroke();
+    ctx.beginPath();ctx.arc(sh.x,sh.y,1.1,0,Math.PI*2);ctx.fillStyle=`rgba(225,232,248,${a})`;ctx.fill();
+    sh.x+=sh.vx;sh.y+=sh.vy;sh.life-=sh.decay;
+    if(sh.life<=0)shooters.splice(i,1);
+  }
+  requestAnimationFrame(draw);
+}
+resize();initStars();draw();
+window.addEventListener('resize',()=>{resize();initStars();});
+const obs=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible');});},{threshold:0.1});
+document.querySelectorAll('.fade').forEach(el=>obs.observe(el));
+</script>
+</body>
+</html>
